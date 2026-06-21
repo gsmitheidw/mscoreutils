@@ -28,10 +28,26 @@ jobs:
         run: |
           choco pack
 
+      - name: Check if version exists
+        id: check
+        shell: pwsh
+        run: |
+          $nuspec = Get-Content .\mscoreutils.nuspec
+          $version = ($nuspec | Select-String -Pattern '<version>(.*)</version>').Matches.Groups[1].Value
+
+          $exists = choco search mscoreutils --exact --version $version
+
+          if ($exists) {
+            echo "skip=true" >> $env:GITHUB_OUTPUT
+            Write-Host "Already exists: $version"
+          } else {
+            echo "skip=false" >> $env:GITHUB_OUTPUT
+          }
+
       - name: Push to Chocolatey
+        if: steps.check.outputs.skip != 'true'
         shell: pwsh
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
         run: |
-          choco push --api-key $env:CHOCO_API_KEY --source="'https://push.chocolatey.org/'"
-
+          choco push --api-key $env:CHOCO_API_KEY --source https://push.chocolatey.org/
