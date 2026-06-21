@@ -35,7 +35,7 @@ jobs:
           $nuspec = Get-Content .\mscoreutils.nuspec
           $version = ($nuspec | Select-String -Pattern '<version>(.*)</version>').Matches.Groups[1].Value
 
-          $exists = choco search mscoreutils --exact --version $version
+          $exists = choco search mscoreutils --exact --version=$version
 
           if ($exists) {
             echo "skip=true" >> $env:GITHUB_OUTPUT
