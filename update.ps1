@@ -3,14 +3,12 @@ Import-Module powershell-yaml
 $repo = "microsoft/coreutils"
 $packageId = "mscoreutils"
 
-# ALWAYS anchor paths to script location
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $tools = Join-Path $root "tools"
 $nuspecPath = Join-Path $root "mscoreutils.nuspec"
 $installPath = Join-Path $tools "chocolateyinstall.ps1"
 
 Write-Host "Root: $root"
-
 Write-Host "Fetching latest release..."
 
 $release = Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest"
@@ -20,13 +18,14 @@ $version = $release.tag_name.TrimStart("v")
 $versionFile = Join-Path $root ".version"
 
 $lastVersion = if (Test-Path $versionFile) {
-    Get-Content $versionFile -Raw
+    (Get-Content $versionFile -Raw).Trim()
 } else {
     ""
 }
 
 if ($version -eq $lastVersion) {
     Write-Host "No new version"
+    "updated=false" >> $env:GITHUB_OUTPUT
     exit 0
 }
 
@@ -52,10 +51,6 @@ $sha = $x64.InstallerSha256
 Write-Host "URL: $url"
 Write-Host "SHA: $sha"
 
-# ----------------------------
-# install script
-# ----------------------------
-
 $installScript = @"
 `$packageArgs = @{
     packageName    = '$packageId'
@@ -74,23 +69,17 @@ Install-ChocolateyPackage @packageArgs
 
 $utf8 = New-Object System.Text.UTF8Encoding($false)
 
-$installScript = $installScript -replace "`r",""
-
-# ENSURE tools folder exists
 if (-not (Test-Path $tools)) {
     New-Item -ItemType Directory -Path $tools | Out-Null
 }
 
 [System.IO.File]::WriteAllText(
     $installPath,
-    $installScript,
+    ($installScript -replace "`r",""),
     $utf8
 )
 
 Write-Host "Updated chocolateyinstall.ps1"
-
-# nuspec update
-# -------------
 
 [xml]$nuspec = Get-Content $nuspecPath
 
@@ -103,25 +92,25 @@ if (-not $node) {
 $node.InnerText = $version
 
 $temp = Join-Path $root "tmp.xml"
+
 $nuspec.Save($temp)
 
 $content = Get-Content $temp -Raw
-$content = $content -replace "`r",""
 
 [System.IO.File]::WriteAllText(
     $nuspecPath,
-    $content,
+    ($content -replace "`r",""),
     $utf8
 )
 
 Remove-Item $temp -Force -ErrorAction SilentlyContinue
 
-Write-Host "Updated nuspec version"
-Write-Host "DONE"
-
-# Include MIT Licence
 Invoke-WebRequest `
-  "https://raw.githubusercontent.com/microsoft/coreutils/main/LICENSE" |
-  Set-Content "tools\LICENSE.txt" -Encoding UTF8
+ "https://raw.githubusercontent.com/microsoft/coreutils/main/LICENSE" |
+ Set-Content "$tools\LICENSE.txt" -Encoding UTF8
 
-Set-Content -Path $versionFile -Value $version -Encoding ASCII
+Set-Content $versionFile $version -Encoding ASCII
+
+"updated=true" >> $env:GITHUB_OUTPUT
+
+Write-Host "DONE"

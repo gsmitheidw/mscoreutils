@@ -19,16 +19,19 @@ jobs:
           Install-Module powershell-yaml -Force -Scope CurrentUser
 
       - name: Run update script
+        id: update
         shell: pwsh
         run: |
           ./update.ps1
 
       - name: Pack Chocolatey package
+        if: steps.update.outputs.updated == 'true'
         shell: pwsh
         run: |
           choco pack .\mscoreutils.nuspec
 
       - name: Push to Chocolatey
+        if: steps.update.outputs.updated == 'true'
         shell: pwsh
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
