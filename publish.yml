@@ -1,4 +1,4 @@
-name: Update and Publish mscoreutils
+name: Update and Publish mscoreutils 
 
 on:
   schedule:
