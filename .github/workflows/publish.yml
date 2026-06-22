@@ -1,4 +1,4 @@
-name: Update and Publish mscoreutils
+name: Update and Publish mscoreutils 
 
 on:
   schedule:
@@ -19,35 +19,21 @@ jobs:
           Install-Module powershell-yaml -Force -Scope CurrentUser
 
       - name: Run update script
+        id: update
         shell: pwsh
         run: |
           ./update.ps1
 
       - name: Pack Chocolatey package
+        if: steps.update.outputs.updated == 'true'
         shell: pwsh
         run: |
-          choco pack
-
-      - name: Check if version exists
-        id: check
-        shell: pwsh
-        run: |
-          $nuspec = Get-Content .\mscoreutils.nuspec
-          $version = ($nuspec | Select-String -Pattern '<version>(.*)</version>').Matches.Groups[1].Value
-
-          $exists = choco list mscoreutils --exact --all | Select-String $version
-
-          if ($exists) {
-            echo "skip=true" >> $env:GITHUB_OUTPUT
-            Write-Host "Already exists: $version"
-          } else {
-            echo "skip=false" >> $env:GITHUB_OUTPUT
-          }
+          choco pack .\mscoreutils.nuspec
 
       - name: Push to Chocolatey
-        if: steps.check.outputs.skip != 'true'
+        if: steps.update.outputs.updated == 'true'
         shell: pwsh
         env:
           CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
         run: |
-          choco push --api-key $env:CHOCO_API_KEY --source https://push.chocolatey.org/
+          choco push *.nupkg --api-key $env:CHOCO_API_KEY --source https://push.chocolatey.org/
