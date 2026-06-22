@@ -1,0 +1,36 @@
+name: Update and Publish mscoreutils
+
+on:
+  schedule:
+    - cron: "0 19 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup PowerShell modules
+        shell: pwsh
+        run: |
+          Install-Module powershell-yaml -Force -Scope CurrentUser
+
+      - name: Run update script
+        shell: pwsh
+        run: |
+          ./update.ps1
+
+      - name: Pack Chocolatey package
+        shell: pwsh
+        run: |
+          choco pack
+
+      - name: Push to Chocolatey
+        shell: pwsh
+        env:
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          choco push *.nupkg --api-key $env:CHOCO_API_KEY --source https://push.chocolatey.org/

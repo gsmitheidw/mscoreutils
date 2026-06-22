@@ -6,9 +6,7 @@
     <title>Microsoft Coreutils</title>
     <authors>Graham Smith (gsmitheidw)</authors>
     <owners>Graham Smith (gsmitheidw)</owners>
-    <projectUrl>
-      https://github.com/microsoft/coreutils
-    </projectUrl>
+    <projectUrl>https://github.com/microsoft/coreutils</projectUrl>
     <licenseUrl>https://github.com/microsoft/coreutils/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
@@ -23,4 +21,8 @@
       coreutils windows microsoft gnu
     </tags>
   </metadata>
+<files>
+  <file src="tools\chocolateyinstall.ps1" target="tools" />
+  <file src="tools\LICENSE.txt" target="tools" />
+</files>
 </package>
