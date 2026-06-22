@@ -26,7 +26,7 @@ jobs:
       - name: Pack Chocolatey package
         shell: pwsh
         run: |
-          choco pack
+          choco pack .\mscoreutils.nuspec
 
       - name: Push to Chocolatey
         shell: pwsh

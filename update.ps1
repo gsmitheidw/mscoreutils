@@ -17,6 +17,19 @@ $release = Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest
 
 $version = $release.tag_name.TrimStart("v")
 
+$versionFile = Join-Path $root ".version"
+
+$lastVersion = if (Test-Path $versionFile) {
+    Get-Content $versionFile -Raw
+} else {
+    ""
+}
+
+if ($version -eq $lastVersion) {
+    Write-Host "No new version"
+    exit 0
+}
+
 Write-Host "Version: $version"
 
 $manifestUrl =
@@ -110,3 +123,5 @@ Write-Host "DONE"
 Invoke-WebRequest `
   "https://raw.githubusercontent.com/microsoft/coreutils/main/LICENSE" |
   Set-Content "tools\LICENSE.txt" -Encoding UTF8
+
+Set-Content -Path $versionFile -Value $version -Encoding ASCII
