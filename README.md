@@ -1,8 +1,8 @@
 # MS CoreUtils Choco Package
 
 [![Workflow](https://github.com/gsmitheidw/mscoreutils/actions/workflows/publish.yml/badge.svg)](https://github.com/gsmitheidw/mscoreutils/actions/workflows/publish.yml)
-![License](https://img.shields.io/github/license/gsmitheidw/mscoreutils)(LICENSE)
-![Last Commit](https://img.shields.io/github/last-commit/gsmitheidw/mscoreutils)
+[![License: MIT](https://img.shields.io/github/license/gsmitheidw/mscoreutils)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/gsmitheidw/mscoreutils)]
 
 
 This is a chocolatey package for the public community repo for [MS CoreUtils](https://github.com/microsoft/coreutils)
