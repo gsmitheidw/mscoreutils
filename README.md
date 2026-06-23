@@ -5,6 +5,11 @@
 ![Last Commit](https://img.shields.io/github/last-commit/gsmitheidw/mscoreutils)
 ![Repo Size](https://img.shields.io/github/repo-size/gsmitheidw/mscoreutils)
 
+<!-- Commented out until approved
+![Chocolatey Version](https://img.shields.io/chocolatey/v/mscoreutils)
+![Chocolatey Downloads](https://img.shields.io/chocolatey/dt/mscoreutils)
+--->
+
 This is a chocolatey package for the public community repo for [MS CoreUtils](https://github.com/microsoft/coreutils)
 
 ## Overview
