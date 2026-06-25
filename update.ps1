@@ -1,4 +1,4 @@
-Import-Module powershell-yaml 
+Import-Module powershell-yaml
 
 $repo = "microsoft/coreutils"
 $packageId = "mscoreutils"
@@ -13,23 +13,26 @@ Write-Host "Fetching latest release..."
 
 $release = Invoke-RestMethod "https://api.github.com/repos/$repo/releases/latest"
 
+if (-not $release.tag_name) {
+    throw "No release tag returned"
+}
+
 $version = $release.tag_name.TrimStart("v")
 
-$versionFile = Join-Path $root ".version"
+[xml]$nuspec = Get-Content $nuspecPath
 
-$lastVersion = if (Test-Path $versionFile) {
-    (Get-Content $versionFile -Raw).Trim()
-} else {
-    ""
-}
+$lastVersion = $nuspec.package.metadata.version.Trim()
+
+Write-Host "Current package version: $lastVersion"
+Write-Host "Latest release version: $version"
 
 if ($version -eq $lastVersion) {
     Write-Host "No new version"
-    "updated=false" >> $env:GITHUB_OUTPUT
+    Add-Content $env:GITHUB_OUTPUT "updated=false"
     exit 0
 }
 
-Write-Host "Version: $version"
+Write-Host "Updating to $version"
 
 $manifestUrl =
 "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/m/Microsoft/Coreutils/$version/Microsoft.Coreutils.installer.yaml"
@@ -39,7 +42,9 @@ Write-Host "Fetching winget manifest..."
 $yaml = Invoke-WebRequest $manifestUrl -ErrorAction Stop
 $manifest = ConvertFrom-Yaml $yaml.Content
 
-$x64 = $manifest.Installers | Where-Object Architecture -eq "x64"
+$x64 = $manifest.Installers |
+    Where-Object Architecture -eq "x64" |
+    Select-Object -First 1
 
 if (-not $x64) {
     throw "x64 installer not found"
@@ -75,13 +80,11 @@ if (-not (Test-Path $tools)) {
 
 [System.IO.File]::WriteAllText(
     $installPath,
-    ($installScript -replace "`r",""),
+    ($installScript -replace "`r", ""),
     $utf8
 )
 
 Write-Host "Updated chocolateyinstall.ps1"
-
-[xml]$nuspec = Get-Content $nuspecPath
 
 $node = $nuspec.SelectSingleNode("//metadata/version")
 
@@ -99,18 +102,17 @@ $content = Get-Content $temp -Raw
 
 [System.IO.File]::WriteAllText(
     $nuspecPath,
-    ($content -replace "`r",""),
+    ($content -replace "`r", ""),
     $utf8
 )
 
 Remove-Item $temp -Force -ErrorAction SilentlyContinue
 
 Invoke-WebRequest `
- "https://raw.githubusercontent.com/microsoft/coreutils/main/LICENSE" |
- Set-Content "$tools\LICENSE.txt" -Encoding UTF8
+    "https://raw.githubusercontent.com/microsoft/coreutils/main/LICENSE" |
+    Set-Content "$tools\LICENSE.txt" -Encoding UTF8
 
-Set-Content $versionFile $version -Encoding ASCII
-
-"updated=true" >> $env:GITHUB_OUTPUT
+Add-Content $env:GITHUB_OUTPUT "updated=true"
 
 Write-Host "DONE"
+
