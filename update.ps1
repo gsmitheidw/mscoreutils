@@ -108,10 +108,6 @@ $content = Get-Content $temp -Raw
 
 Remove-Item $temp -Force -ErrorAction SilentlyContinue
 
-Invoke-WebRequest `
-    "https://raw.githubusercontent.com/microsoft/coreutils/main/LICENSE" |
-    Set-Content "$tools\LICENSE.txt" -Encoding UTF8
-
 Add-Content $env:GITHUB_OUTPUT "updated=true"
 
 Write-Host "DONE"
