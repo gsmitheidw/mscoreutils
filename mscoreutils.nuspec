@@ -4,10 +4,11 @@
     <id>mscoreutils</id>
     <version>2026.6.16</version>
     <title>Microsoft Coreutils</title>
-    <authors>Graham Smith (gsmitheidw)</authors>
-    <owners>Graham Smith (gsmitheidw)</owners>
+    <authors>Microsoft</authors>
+    <owners>gsmitheidw</owners>
     <projectUrl>https://github.com/microsoft/coreutils</projectUrl>
     <licenseUrl>https://github.com/microsoft/coreutils/blob/main/LICENSE</licenseUrl>
+    <packageSourceUrl>https://github.com/gsmitheidw/mscoreutils/</packageSourceUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
       Chocolatey package for Microsoft Coreutils for Windows.
