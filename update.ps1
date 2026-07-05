@@ -57,6 +57,9 @@ Write-Host "URL: $url"
 Write-Host "SHA: $sha"
 
 $installScript = @"
+
+`$ErrorActionPreference = 'Stop'
+
 `$packageArgs = @{
     packageName    = '$packageId'
     fileType       = 'exe'
