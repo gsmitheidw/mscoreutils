@@ -1,3 +1,5 @@
+$ErrorActionPreference = 'Stop'
+
 $packageArgs = @{
     packageName    = 'mscoreutils'
     fileType       = 'exe'
