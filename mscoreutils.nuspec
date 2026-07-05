@@ -23,6 +23,5 @@
   </metadata>
   <files>
     <file src="tools\chocolateyinstall.ps1" target="tools" />
-    <file src="tools\LICENSE.txt" target="tools" />
   </files>
 </package>
