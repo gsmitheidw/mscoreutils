@@ -16,6 +16,7 @@ jobs:
       - name: Setup PowerShell modules
         shell: pwsh
         run: |
+	  Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
           Install-Module powershell-yaml -Force -Scope CurrentUser
 
       - name: Run update script
